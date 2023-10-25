@@ -5,14 +5,14 @@
 - 분류 평가 지표
 - 의사결정나무 실습
 ## 논리회귀
-선형 회귀 방식을 이용한 이진 분류 알고리즘
+선형 회귀 방식을 이용한 이진 분류 알고리즘이다.(0이냐 1이냐)
 ### 선형회귀로 풀기 힘든 문제의 등장
 시험 전 날 공부한 시간을 가지고 해당 과목의 이수 여부(pass or fail)를 예측하는 문제
 
 - Fail(미이수): 0
 - Pass(이수): 1
 
-선형 회귀로 풀었을때,
+선형 회귀로 풀었을때, 0.5가 넘으면 통과로 분류해야되는데 떨어지는 것들도 있기 때문에 논리회귀를 씀.
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/ef6de9aa-6d34-4b9a-b7b8-e73e2781ce72)
 
@@ -28,6 +28,7 @@ x(입력)가 양수 방향으로 갈 수록 y(출력)가 1에 가까워진다.
 
 즉, 시그모이드 함수를 통과하면 0 에서 1 사이 값이 나온다.
 
+분류 문제를 풀때 효과적이다.
 ```
 실제 많은 자연, 사회현상에서는 특정 변수에 대한 확률값이 선형이 아닌 S 커브 형태를 따르는 경우가 많다고 합니다. 이러한 S-커브를 함수로 표현해낸 것이 바로 로지스틱 함수(Logistic function)입니다. 딥러닝에서는 시그모이드 함수(Sigmoid function)라고 불립니다.
 ```
@@ -50,13 +51,17 @@ x(입력)가 양수 방향으로 갈 수록 y(출력)가 1에 가까워진다.
 ```python
 from sklearn.datasets import load_breast_cancer
 import pandas as pd
+// pandas와 load_breast_cancer 데이터 셋을 가져온다.
 
 data = load_breast_cancer()
+// 데이터 넣어준다.
 
 df = pd.DataFrame(data['data'], columns=data['feature_names'])
 df['target'] = data['target']
+// 판다스의 데이터프레임 함수로 데이터 셋 시켜준다.
 
 df.head()
+// 상위 5개 데이터를 보여준다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/313fb13d-8a4b-4b0f-918d-fd6a97991684)
@@ -64,6 +69,7 @@ df.head()
 #### 데이터 시각화
 ```python
 df.describe()
+// df의 형태를 묘사한다. (describe : 묘사하는 함수)
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/070a00d5-0ff5-4f10-aad5-c6fa3ed680b7)
@@ -72,8 +78,10 @@ df.describe()
 ```python
 import matplotlib.pyplot as plt
 import seaborn as sns
+// matplotlib.pyplot과 seaborn 패키지를 가져온다.
 
 sns.countplot(x=df['target'])
+// 0과 1의 대한 데이터를 세주는 그래프를 만든다.
 plt.show()
 ```
 
@@ -81,12 +89,16 @@ plt.show()
 #### 데이터 전처리
 ```python
 from sklearn.preprocessing import StandardScaler
+// StandardScaler 표준화 패키지를 가져온다.
 
 scaler = StandardScaler()
+// scaler 변수에 StandardScaler() 객체를 생성한다.
 
 scaled = scaler.fit_transform(df.drop(columns=['target']))
+// scaler 데이터에서 taget 값은 제거하고 표준화 시켜준다.
 
 scaled[0]
+// scaled의 0번째 데이터를 보여준다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/2b6cbe3d-5c2d-4d4f-90a3-6dfb4225ce78)
@@ -94,11 +106,14 @@ scaled[0]
 #### 데이터셋 분할
 ```python
 from sklearn.model_selection import train_test_split
+// train_test_split 패키지를 가져온다.
 
 x_train, x_val, y_train, y_val = train_test_split(scaled, df['target'], random_state=2020)
+// scaled와 taget값으로 분할 시켜준다.
 
 print(x_train.shape, y_train.shape)
 print(x_val.shape, y_val.shape)
+// 분할된 데이터의 형태를 알아본다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/de1439aa-7b22-4584-90aa-88062624ef41)
@@ -107,14 +122,19 @@ print(x_val.shape, y_val.shape)
 ```python
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
+// 논리회귀와 정확도 패키지를 가져온다.
 
 model = LogisticRegression()
+// 모델정의
 
 model.fit(x_train, y_train)
+// 모델 훈련
 
 y_pred = model.predict(x_val)
+// 정답값 예측
 
 accuracy_score(y_val, y_pred)
+// 정답값과 예측값 비교
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/c0bea902-d598-45a0-ab74-82f3ce3a0e13)
@@ -132,15 +152,23 @@ accuracy_score(y_val, y_pred)
 
 ```python
 from sklearn.metrics import confusion_matrix
+// confusion_matrix 패키지를 가져온다.
 
 cm = confusion_matrix(y_val, y_pred)
+// 예측한 값과 정답 값을 표로 나타낸다.
 
 cm
 ```
+![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/0fca2755-6bce-4537-a77e-ec86cf8bace3)
+
 ```python
 sns.heatmap(cm, annot=True, cmap='PiYG')
+// 악성과 약성에 대한 히트맵을 그린다.
+
 plt.xlabel('Predicted')
 plt.ylabel('Ground Truth')
+// x축은 예측한 값이고 y는 정답 값이다.
+
 plt.show()
 ```
 
@@ -148,25 +176,30 @@ plt.show()
 
 ```python
 TN, FP, FN, TP = cm.flatten()
+// 2차원이었던 데이터값을 1차원으로 바꿔준다.
 
 print(TP, TN, FP, FN)
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/a7151265-7188-4d49-86fe-74b4c1a7db49)
+
 ### 정확도 Accuracy
 - 얼마나 정답을 잘 예측했는가
 - Accruacy = (TP + TN) / Total
 
 ```python
 (TP + TN) / (TP + TN + FP + FN)
+// 정확도는 모든 값을 더하고 맞은 값으로 나누면 된다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/56262c2c-ce9f-4abb-885f-7d6e782afb01)
 
 ```python
 from sklearn.metrics import accuracy_score
+// accuracy_score 패키지를 가져온다.
 
 accuracy_score(y_val, y_pred)
+// 정답 값과 예측 값을 비교하여 정확도를 알아낸다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/e1bb8bf6-8451-48b4-9f8b-2e30e85e5e3a)
@@ -176,6 +209,7 @@ accuracy_score(y_val, y_pred)
 
 ```python
 (FP + FN) / (TP + TN + FP + FN)
+// 오류율은 모든 값을 더하고 틀린 값으로 나누면 된다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/8b4687a6-4b4d-4241-87e9-ea1b11924884)
@@ -191,14 +225,17 @@ Precision = TP / Predicted yes
 
 ```python
 TP / (TP + FP)
+// Positive 값들을 다 더하고 맞은 Positive 값을 나눈다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/1d462da7-5add-4761-b52b-a2ed679beb08)
 
 ```python
 from sklearn.metrics import precision_score
+// precision_score 패키지를 사용하여 정밀도를 확인할 수 있다.
 
 precision_score(y_val, y_pred)
+// 정답 값과 예측 값을 비교하여 정밀도를 확인한다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/7c454770-6223-4dc4-8109-aee90fd73d16)
@@ -215,25 +252,31 @@ Recall = TP / Actual yes
 
 ```python
 TP / (FN + TP)
+// 맞는 Positive와 틀린 Negative 값을 더하고 맞은 Positive 값으로 나눈다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/3b34e68b-3e4e-4f02-8fbb-9ff977189c04)
 
 ```python
 from sklearn.metrics import recall_score
+// recall_score 패키지를 가져온다.
 
 recall_score(y_val, y_pred)
+// 정답값과 예측값을 비교하여 재현율을 확인한다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/0cad149d-ffc1-4d78-92ef-dd4ec5c58720)
 ### F1 Score
 - 정밀도와 재현율의 균형도 (가중 평균)
 - F1 = 2 * (precision * recall) / (precision + recall)
+- 정밀도와 재현율을 잘 표현했다고 보면된다.
 
 ```python
 from sklearn.metrics import f1_score
+// f1_score를 가져온다
 
 f1_score(y_val, y_pred)
+// 정답 값과 예측 값을 비교하여 f1 score를 확인한다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/e672edb1-8206-470f-b49e-2a57898565ec)
@@ -246,26 +289,33 @@ Decision Tree 스무 고개
 #### 모델 정의, 학습, 검증
 ```python
 from sklearn.tree import DecisionTreeClassifier
+// DecisionTreeClassifier 모델을 가져온다.
 
 model = DecisionTreeClassifier()
+// 모델정의
 
 model.fit(x_train, y_train)
+// 모델 훈련
 
 y_pred = model.predict(x_val)
+// 정답값 예측
 
 accuracy_score(y_val, y_pred)S
+// 정답값과 예측값을 비교하여 정확도를 확인한다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/c58906ab-ccc8-4b9e-824c-68f91ebc4443)
 #### 의사결정나무 시각화
 ```python
 !pip install -q dtreeviz
+// dtreeviz 패키지를 설치한다.
 ```
 
 ![image](https://github.com/hsy0511/bbang-hyung-4/assets/104752580/28614b64-ffd6-46e7-8111-1770acfcc924)
 
 ```python
 from dtreeviz.trees import dtreeviz
+// dtreeviz 패키지를 가져온다.
 
 viz = dtreeviz(model, 
   x_train,
@@ -273,7 +323,7 @@ viz = dtreeviz(model,
   target_name='target',
   feature_names=data['feature_names'],
   class_names=['Malignant', 'Benign'])
-
+// 모델과 train데이터, 타겟, 퓨쳐네임, 악성과 양성을 넣어서 dtreeviz를 만든다.
 viz
 ```
 
@@ -288,6 +338,7 @@ features = pd.DataFrame(
     index=data['feature_names'],
     columns=['importance']
 ).sort_values('importance', ascending=False)
+// 악성과 약성을 분류하는데 가장 중요한것들을 중요한 순서대로 데이터 프레임으로 나타낸다.
 
 features
 ```
@@ -298,6 +349,7 @@ features
 
 ```python
 features.plot.bar(figsize=(16, 6))
+// 퓨쳐의 중요도를 가로16, 세로 6인 막대차트를 통해 알 수 있다.
 plt.show()
 ```
 
